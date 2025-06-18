@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash 
 import logging 
 import traceback 
+from logging.handlers import RotatingFileHandler 
 from forms import FeedbackForm 
 from db import get_db_connection 
  
@@ -8,7 +9,11 @@ from db import get_db_connection
 app = Flask(__name__) 
  
 # Configure logging 
-logging.basicConfig(level=logging.INFO) 
+log_handler = RotatingFileHandler('logs/feedback_app.log', maxBytes=10000, backupCount=3) 
+log_handler.setLevel(logging.INFO) 
+log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s') 
+log_handler.setFormatter(log_formatter) 
+app.logger.addHandler(log_handler) 
  
 # Add a secret key for CSRF protection 
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # INPUT_REQUIRED {Set a secure secret key for CSRF protection} 
@@ -16,19 +21,19 @@ app.config['SECRET_KEY'] = 'your_secret_key_here'  # INPUT_REQUIRED {Set a secur
 @app.route('/') 
 def home(): 
     try: 
-        logging.info("Rendering homepage.") 
+        app.logger.info("Rendering homepage.") 
         return render_template('index.html') 
     except Exception as e: 
-        logging.error("Error rendering homepage: %s", traceback.format_exc()) 
+        app.logger.error("Error rendering homepage: %s", traceback.format_exc()) 
         return "An error occurred while loading the homepage.", 500 
  
 @app.route('/feedback-form', methods=['GET', 'POST']) 
 def feedback_form(): 
     try: 
-        logging.info("Accessing feedback form page.") 
+        app.logger.info("Accessing feedback form page.") 
         form = FeedbackForm() 
         if form.validate_on_submit(): 
-            logging.info("Feedback form submitted successfully.") 
+            app.logger.info("Feedback form submitted successfully.") 
  
             # Extract form data 
             username = form.username.data 
@@ -48,9 +53,9 @@ def feedback_form():
                         """ 
                         cursor.execute(sql, (username, email, phone, comments, rating)) 
                     connection.commit() 
-                    logging.info("Feedback data saved to the database successfully.") 
+                    app.logger.info("Feedback data saved to the database successfully.") 
                 except Exception as e: 
-                    logging.error("Error saving feedback to the database: %s", traceback.format_exc()) 
+                    app.logger.error("Error saving feedback to the database: %s", traceback.format_exc()) 
                 finally: 
                     connection.close() 
  
@@ -59,13 +64,13 @@ def feedback_form():
  
         return render_template('feedback_form.html', form=form) 
     except Exception as e: 
-        logging.error("Error processing feedback form: %s", traceback.format_exc()) 
+        app.logger.error("Error processing feedback form: %s", traceback.format_exc()) 
         return "An error occurred while processing the feedback form.", 500 
  
 @app.route('/feedback-list') 
 def feedback_list(): 
     try: 
-        logging.info("Accessing feedback list page.") 
+        app.logger.info("Accessing feedback list page.") 
         connection = get_db_connection() 
         feedback_entries = [] 
         if connection: 
@@ -74,20 +79,20 @@ def feedback_list():
                     sql = "SELECT username, email, comments, rating FROM feedback" 
                     cursor.execute(sql) 
                     feedback_entries = cursor.fetchall() 
-                logging.info("Feedback data retrieved successfully.") 
+                app.logger.info("Feedback data retrieved successfully.") 
             except Exception as e: 
-                logging.error("Error retrieving feedback from the database: %s", traceback.format_exc()) 
+                app.logger.error("Error retrieving feedback from the database: %s", traceback.format_exc()) 
             finally: 
                 connection.close() 
  
         return render_template('feedback_list.html', feedback_entries=feedback_entries) 
     except Exception as e: 
-        logging.error("Error accessing feedback list page: %s", traceback.format_exc()) 
+        app.logger.error("Error accessing feedback list page: %s", traceback.format_exc()) 
         return "An error occurred while loading the feedback list page.", 500 
  
 if __name__ == '__main__': 
     try: 
-        logging.info("Starting Flask application on port 5001.") 
+        app.logger.info("Starting Flask application on port 5001.") 
         app.run(port=5001, debug=True) 
     except Exception as e: 
-        logging.error("Error starting Flask application: %s", traceback.format_exc())
+        app.logger.error("Error starting Flask application: %s", traceback.format_exc())
