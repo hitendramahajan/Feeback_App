@@ -31,7 +31,8 @@ def feedback_form():
             logging.info("Feedback form submitted successfully.") 
  
             # Extract form data 
-            username = form.username.data 
+            first_name = form.first_name.data 
+            last_name = form.last_name.data 
             email = form.email.data 
             phone = form.phone.data 
             comments = form.comments.data 
@@ -43,10 +44,10 @@ def feedback_form():
                 try: 
                     with connection.cursor() as cursor: 
                         sql = """ 
-                        INSERT INTO feedback (username, email, phone, comments, rating) 
-                        VALUES (%s, %s, %s, %s, %s) 
+                        INSERT INTO feedback (first_name, last_name, email, phone, comments, rating) 
+                        VALUES (%s, %s, %s, %s, %s, %s) 
                         """ 
-                        cursor.execute(sql, (username, email, phone, comments, rating)) 
+                        cursor.execute(sql, (first_name, last_name, email, phone, comments, rating)) 
                     connection.commit() 
                     logging.info("Feedback data saved to the database successfully.") 
                 except Exception as e: 
@@ -71,7 +72,7 @@ def feedback_list():
         if connection: 
             try: 
                 with connection.cursor() as cursor: 
-                    sql = "SELECT username, email, comments, rating FROM feedback" 
+                    sql = "SELECT first_name, last_name, email, comments, rating FROM feedback" 
                     cursor.execute(sql) 
                     feedback_entries = cursor.fetchall() 
                 logging.info("Feedback data retrieved successfully.") 
