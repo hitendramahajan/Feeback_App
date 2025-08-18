@@ -8,7 +8,7 @@ from db import get_db_connection
 app = Flask(__name__) 
  
 # Configure logging 
-logging.basicConfig(level=logging.INFO) 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') 
  
 # Add a secret key for CSRF protection 
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # INPUT_REQUIRED {Set a secure secret key for CSRF protection} 
@@ -51,6 +51,7 @@ def feedback_form():
                     logging.info("Feedback data saved to the database successfully.") 
                 except Exception as e: 
                     logging.error("Error saving feedback to the database: %s", traceback.format_exc()) 
+                    flash('An error occurred while saving your feedback. Please try again.', 'error') 
                 finally: 
                     connection.close() 
  
@@ -60,7 +61,8 @@ def feedback_form():
         return render_template('feedback_form.html', form=form) 
     except Exception as e: 
         logging.error("Error processing feedback form: %s", traceback.format_exc()) 
-        return "An error occurred while processing the feedback form.", 500 
+        flash('An error occurred while processing the feedback form. Please try again.', 'error') 
+        return redirect(url_for('feedback_form')) 
  
 @app.route('/feedback-list') 
 def feedback_list(): 
@@ -77,13 +79,15 @@ def feedback_list():
                 logging.info("Feedback data retrieved successfully.") 
             except Exception as e: 
                 logging.error("Error retrieving feedback from the database: %s", traceback.format_exc()) 
+                flash('An error occurred while retrieving feedback data. Please try again later.', 'error') 
             finally: 
                 connection.close() 
  
         return render_template('feedback_list.html', feedback_entries=feedback_entries) 
     except Exception as e: 
         logging.error("Error accessing feedback list page: %s", traceback.format_exc()) 
-        return "An error occurred while loading the feedback list page.", 500 
+        flash('An error occurred while loading the feedback list page. Please try again later.', 'error') 
+        return redirect(url_for('home')) 
  
 if __name__ == '__main__': 
     try: 

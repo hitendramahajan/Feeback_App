@@ -1,0 +1,15 @@
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8"/> 
+    <title>Error</title> 
+    <link rel="stylesheet" th:href="@{/css/styles.css}" href="/css/styles.css"/> 
+</head> 
+<body> 
+    <div class="container"> 
+        <h2>Oops!</h2> 
+        <p th:text="${errorMessage}">An unexpected error occurred. Please try again later.</p> 
+        <a href="/" class="btn btn-primary">Go Home</a> 
+    </div> 
+</body> 
+</html> 
