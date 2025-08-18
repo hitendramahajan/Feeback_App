@@ -10,31 +10,48 @@
         <form th:action="@{/feedback/new}" th:object="${feedbackForm}" method="post"> 
             <div class="form-group"> 
                 <label for="username">Username<span class="required">*</span></label> 
-                <input type="text" th:field="*{username}" id="username" class="form-control" /> 
+                <input type="text" th:field="*{username}" id="username" class="form-control" maxlength="100" required /> 
                 <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div> 
             </div> 
             <div class="form-group"> 
                 <label for="email">Email<span class="required">*</span></label> 
-                <input type="email" th:field="*{email}" id="email" class="form-control" /> 
+                <input type="email" th:field="*{email}" id="email" class="form-control" maxlength="100" required /> 
                 <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div> 
             </div> 
             <div class="form-group"> 
                 <label for="phone">Phone<span class="required">*</span></label> 
-                <input type="text" th:field="*{phone}" id="phone" class="form-control" /> 
+                <input type="text" th:field="*{phone}" id="phone" class="form-control" maxlength="20" pattern="^[0-9\-\\+]{9,20}$" required /> 
                 <div class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div> 
             </div> 
             <div class="form-group"> 
                 <label for="comments">Comments<span class="required">*</span></label> 
-                <textarea th:field="*{comments}" id="comments" class="form-control" rows="4"></textarea> 
+                <textarea th:field="*{comments}" id="comments" class="form-control" rows="4" maxlength="1000" required></textarea> 
                 <div class="error" th:if="${#fields.hasErrors('comments')}" th:errors="*{comments}"></div> 
             </div> 
             <div class="form-group"> 
-                <label for="starRating">Star Rating<span class="required">*</span></label> 
-                <select th:field="*{starRating}" id="starRating" class="form-control" required> 
-                    <option th:value="" disabled th:selected="${feedbackForm.starRating == null}">-- Select --</option> 
-                    <option th:each="rating : ${T(com.sasva.feedback.model.StarRating).values()}" 
-                            th:value="${rating}" th:text="${rating.label}"></option> 
-                </select> 
+                <label>Star Rating<span class="required">*</span></label> 
+                <div class="star-rating-group"> 
+                    <label> 
+                        <input type="radio" th:field="*{starRating}" value="ONE" required /> 
+                        1 
+                    </label> 
+                    <label> 
+                        <input type="radio" th:field="*{starRating}" value="TWO" /> 
+                        2 
+                    </label> 
+                    <label> 
+                        <input type="radio" th:field="*{starRating}" value="THREE" /> 
+                        3 
+                    </label> 
+                    <label> 
+                        <input type="radio" th:field="*{starRating}" value="FOUR" /> 
+                        4 
+                    </label> 
+                    <label> 
+                        <input type="radio" th:field="*{starRating}" value="FIVE" /> 
+                        5 
+                    </label> 
+                </div> 
                 <div class="error" th:if="${#fields.hasErrors('starRating')}" th:errors="*{starRating}"></div> 
             </div> 
             <button type="submit" class="btn">Submit</button> 

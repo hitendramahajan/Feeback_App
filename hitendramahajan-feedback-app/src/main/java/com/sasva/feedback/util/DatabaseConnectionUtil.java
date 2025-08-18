@@ -1,51 +1,95 @@
 package com.sasva.feedback.util; 
  
-import org.slf4j.Logger; 
-import org.slf4j.LoggerFactory; 
-import org.springframework.beans.factory.annotation.Value; 
-import org.springframework.stereotype.Component; 
- 
-import javax.annotation.PostConstruct; 
 import java.sql.Connection; 
 import java.sql.DriverManager; 
 import java.sql.SQLException; 
  
 /** 
- * Utility class for managing MySQL database connections. 
- * Provides methods to obtain connections, with integrated logging and error handling. 
+ * Utility for establishing database connections. 
+ * 
+ * <p> 
+ * <b>Python mapping:</b> 
+ * <pre> 
+ * # db.py (Python) 
+ * def get_db_connection(): 
+ *     conn = mysql.connector.connect(...) 
+ *     return conn 
+ * </pre> 
+ * In the original Python Flask app, database connections were managed via a helper function in <code>db.py</code>. 
+ * In Java, we use a static utility method and JDBC for connection management. 
+ * </p> 
+ * 
+ * <p> 
+ * <b>Major translation points:</b> 
+ * <ul> 
+ *   <li>Python uses <code>mysql.connector.connect</code> with keyword arguments; Java uses <code>DriverManager.getConnection</code> with a JDBC URL.</li> 
+ *   <li>Python returns a connection object; Java returns a <code>java.sql.Connection</code> object.</li> 
+ *   <li>Python's exceptions are caught with <code>except Exception as e</code>; Java uses <code>try-catch</code> for <code>SQLException</code>.</li> 
+ *   <li>In Java, resource management is typically handled with try-with-resources for automatic closing.</li> 
+ *   <li>Connection details are hardcoded here for clarity, but in production should be externalized (e.g., <code>application.properties</code>).</li> 
+ * </ul> 
+ * </p> 
+ * 
+ * <p> 
+ * <b>Example usage:</b> 
+ * <pre> 
+ * try (Connection conn = DatabaseConnectionUtil.getConnection()) { 
+ *     // Use the connection 
+ * } catch (SQLException e) { 
+ *     // Handle error 
+ * } 
+ * </pre> 
+ * </p> 
+ * 
+ * <p> 
+ * <b>Architectural difference:</b> 
+ * <ul> 
+ *   <li>Python's dynamic typing and duck-typed connections are replaced by Java's static typing and checked exceptions.</li> 
+ *   <li>Java encourages explicit error handling and logging at every step.</li> 
+ * </ul> 
+ * </p> 
  */ 
-@Component 
 public class DatabaseConnectionUtil { 
  
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseConnectionUtil.class); 
- 
-    @Value("${spring.datasource.url}") 
-    private String dbUrl; 
- 
-    @Value("${spring.datasource.username}") 
-    private String dbUser; 
- 
-    @Value("${spring.datasource.password}") 
-    private String dbPassword; 
- 
-    @PostConstruct 
-    public void init() { 
-        logger.info("DatabaseConnectionUtil initialized with URL: {}", dbUrl); 
-    } 
- 
     /** 
-     * Get a database connection. 
-     * @return Connection object 
-     * @throws SQLException if unable to get connection 
+     * Obtain a new database connection. 
+     * 
+     * <p> 
+     * <b>Python equivalent:</b> 
+     * <pre> 
+     * conn = mysql.connector.connect( 
+     *     host="localhost", 
+     *     user="root", 
+     *     password="password", 
+     *     database="feedbackdb" 
+     * ) 
+     * </pre> 
+     * <b>Java:</b> 
+     * <pre> 
+     * Connection conn = DriverManager.getConnection(url, user, password); 
+     * </pre> 
+     * </p> 
+     * 
+     * @return a new JDBC Connection to the feedback database 
+     * @throws SQLException if a database access error occurs 
      */ 
-    public Connection getConnection() throws SQLException { 
+    public static Connection getConnection() throws SQLException { 
+        // In production, these should be externalized to application.properties or environment variables. 
+        // INPUT_REQUIRED {Set your MySQL JDBC URL, username, and password below} 
+        String url = "jdbc:mysql://localhost:3306/feedbackdb"; // INPUT_REQUIRED {JDBC URL for your MySQL database} 
+        String user = "root"; // INPUT_REQUIRED {MySQL username} 
+        String password = "password"; // INPUT_REQUIRED {MySQL password} 
+ 
         try { 
-            logger.debug("Attempting to connect to database: {}", dbUrl); 
-            Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPassword); 
-            logger.info("Database connection established successfully."); 
+            // Logging is important for debugging connection issues. 
+            System.out.println("Attempting to connect to database: " + url); 
+            Connection conn = DriverManager.getConnection(url, user, password); 
+            System.out.println("Database connection established successfully."); 
             return conn; 
         } catch (SQLException e) { 
-            logger.error("Failed to establish database connection: {}", e.getMessage(), e); 
+            // Log the full stack trace for troubleshooting. 
+            System.err.println("Failed to establish database connection: " + e.getMessage()); 
+            e.printStackTrace(); 
             throw e; 
         } 
     } 

@@ -2,27 +2,31 @@ package com.sasva.feedback;
  
 import org.springframework.boot.SpringApplication; 
 import org.springframework.boot.autoconfigure.SpringBootApplication; 
-import org.slf4j.Logger; 
-import org.slf4j.LoggerFactory; 
  
 /** 
- * Main application class for the Hitendramahajan Feedback App. 
- * This class bootstraps the Spring Boot application. 
+ * Application entry point. 
+ * 
+ * <p> 
+ * This class is the equivalent of Python's <code>app.py</code> in the original Flask application. 
+ * In Flask, the application is created and run via <code>app = Flask(__name__)</code> and <code>app.run()</code>. 
+ * In Spring Boot, the application is launched using <code>SpringApplication.run()</code>. 
+ * </p> 
+ * 
+ * <pre> 
+ * # Python (Flask) 
+ * if __name__ == '__main__': 
+ *     app.run() 
+ * 
+ * // Java (Spring Boot) 
+ * public static void main(String[] args) { 
+ *     SpringApplication.run(...); 
+ * } 
+ * </pre> 
  */ 
 @SpringBootApplication 
 public class HitendramahajanFeedbackAppApplication { 
  
-    private static final Logger logger = LoggerFactory.getLogger(HitendramahajanFeedbackAppApplication.class); 
- 
     public static void main(String[] args) { 
-        try { 
-            logger.info("Starting Hitendramahajan Feedback App Application..."); 
-            SpringApplication.run(HitendramahajanFeedbackAppApplication.class, args); 
-            logger.info("Application started successfully."); 
-        } catch (Exception e) { 
-            logger.error("Application failed to start.", e); 
-            // Optionally, rethrow or exit 
-            System.exit(1); 
-        } 
+        SpringApplication.run(HitendramahajanFeedbackAppApplication.class, args); 
     } 
-} 
+}
