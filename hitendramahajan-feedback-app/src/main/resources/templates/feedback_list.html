@@ -1,0 +1,43 @@
+<!DOCTYPE html> 
+<html xmlns:th="http://www.thymeleaf.org"> 
+<head> 
+    <title>Feedback List</title> 
+    <link rel="stylesheet" th:href="@{/css/styles.css}" /> 
+</head> 
+<body> 
+    <div class="container"> 
+        <h2>All Feedback</h2> 
+        <table class="feedback-table"> 
+            <thead> 
+                <tr> 
+                    <th>ID</th> 
+                    <th>Username</th> 
+                    <th>Email</th> 
+                    <th>Phone</th> 
+                    <th>Comments</th> 
+                    <th>Star Rating</th> 
+                    <th>Submitted At</th> 
+                </tr> 
+            </thead> 
+            <tbody> 
+                <tr th:each="feedback : ${feedbackList}"> 
+                    <td th:text="${feedback.id}">1</td> 
+                    <td th:text="${feedback.username}">John Doe</td> 
+                    <td th:text="${feedback.email}">john@example.com</td> 
+                    <td th:text="${feedback.phone}">1234567890</td> 
+                    <td th:text="${feedback.comments}">Great service!</td> 
+                    <td th:text="${feedback.starRating != null ? feedback.starRating.value : ''}">5</td> 
+                    <td th:text="${feedback.createdAt != null ? #dates.format(feedback.createdAt, 'yyyy-MM-dd HH:mm') : ''}">2024-06-09 12:00</td> 
+                </tr> 
+                <tr th:if="${feedbackList == null or feedbackList.size() == 0}"> 
+                    <td colspan="7" class="no-feedback">No feedback entries found.</td> 
+                </tr> 
+            </tbody> 
+        </table> 
+        <div> 
+            <a th:href="@{/}" class="btn-secondary">Back to Home</a> 
+            <a th:href="@{/feedback/new}" class="btn-secondary">Submit New Feedback</a> 
+        </div> 
+    </div> 
+</body> 
+</html>
